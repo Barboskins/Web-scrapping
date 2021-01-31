@@ -6,12 +6,14 @@ from bs4 import BeautifulSoup
 Поиск вести по всей доступной preview-информации (это информация, доступная непосредственно с текущей страницы). 
 Вывести в консоль список подходящих статей в формате: <дата> - <заголовок> - <ссылка>."""
 
-KEYWORDS = ['вебинар', 'фото', 'web', 'python','проект','расставить']
+KEYWORDS = ['максвелла','react','дыры']  #для проверки 1-ой функции
+KEYWORDS = ['теория','визуал','маршрутизатор ']   #для проверки 2-ой функции
 
 def search_by_preview(link_):
   response = requests.get(link_)
   soup = BeautifulSoup(response.text,'html.parser')
   posts = soup.find_all('article',class_='post')
+  post_list = []
   for post in posts:
     text_list = []
     text_list.append(post.text.strip().lower())
@@ -21,8 +23,9 @@ def search_by_preview(link_):
         link = post.find('a',class_ = 'post__title_link')
         link_link = link.attrs.get('href')
         link_text = link.text.strip()
+        post_list.append(f'{data_post} - {link_text} - {link_link}')
         break
-  return f'{data_post} - {link_text} - {link_link}'
+  return post_list
 
 
 
@@ -34,6 +37,7 @@ def full_article_search(link_):
   response = requests.get(link_)
   soup = BeautifulSoup(response.text,'html.parser')
   posts = soup.find_all('a',class_='btn btn_x-large btn_outline_blue post__habracut-btn')
+  post_list = []
   for post in posts:
     link = post.attrs.get('href')
     response_link = requests.get(link)
@@ -46,7 +50,8 @@ def full_article_search(link_):
         if any ((elem in artic.split() for elem in KEYWORDS)):
           data_post = article.find('span', class_ = 'post__time').text.strip()
           link_text = article.find('span',class_ = 'post__title-text').text.strip()
-  return f'{data_post} - {link_text} - {link}'
+          post_list.append(f'{data_post} - {link_text} - {link}')
+  return post_list
 
 
 if __name__ == '__main__':
